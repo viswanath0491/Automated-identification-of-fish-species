@@ -3,34 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fish Species Identifier</title>
+    <title>Fish Species Identifier | Deep Ocean</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; }
-        h1 { color: #333; }
-        input[type="file"] { margin: 20px 0; }
-        button { background-color: #007BFF; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px; border-radius: 5px; }
-        button:hover { background-color: #0056b3; }
-        .result { margin-top: 20px; font-size: 24px; color: green; font-weight: bold; }
-        img { max-width: 300px; margin-top: 20px; border-radius: 5px; }
+        :root {
+            --ocean-dark: #001219;
+            --ocean-mid: #005f73;
+            --ocean-light: #94d2bd;
+            --accent: #ee9b00;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, var(--ocean-mid) 0%, var(--ocean-dark) 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Motion Graphic Background Bubbles */
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: rise 10s infinite ease-in;
+            z-index: 0;
+        }
+
+        @keyframes rise {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            margin-top: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: var(--ocean-light);
+            text-shadow: 0 0 10px rgba(148, 210, 189, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--ocean-light);
+            padding: 30px;
+            border-radius: 20px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: rgba(148, 210, 189, 0.1);
+            border-color: var(--accent);
+        }
+
+        input[type="file"] { margin-bottom: 20px; }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(238, 155, 0, 0.4);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #ca8a04;
+        }
+
+        .result-card {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .fish-img {
+            max-width: 100%;
+            border-radius: 15px;
+            margin-top: 15px;
+            border: 3px solid var(--ocean-light);
+        }
+
+        .error { color: #ff4d4d; font-weight: bold; }
     </style>
 </head>
 <body>
+
+    <script>
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            const size = Math.random() * 60 + 10 + 'px';
+            bubble.style.width = size;
+            bubble.style.height = size;
+            bubble.style.left = Math.random() * 100 + 'vw';
+            bubble.style.animationDuration = Math.random() * 5 + 5 + 's';
+            document.body.appendChild(bubble);
+            setTimeout(() => bubble.remove(), 10000);
+        }
+        setInterval(createBubble, 500);
+    </script>
+
     <div class="container">
-        <h1>🐟 Fish Species Identification</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" accept="image/*" required>
+        <h1>🐟 Fish ID AI</h1>
+        
+        {% if error_msg %}
+            <p class="error">{{ error_msg }}</p>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            <div class="upload-area">
+                <input type="file" name="file" required>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Drop image here or click to browse</p>
+            </div>
             <br>
-            <button type="submit">Identify Species</button>
+            <button type="submit">Analyze Marine Life</button>
         </form>
 
-        {% if img_url %}
-            <img src="{{ img_url }}" alt="Uploaded Fish">
-        {% endif %}
-
         {% if prediction %}
-            <div class="result">Prediction: {{ prediction }}</div>
+            <div class="result-card">
+                <h2 style="color: var(--accent);">Result: {{ prediction }}</h2>
+                <p>Confidence Level: <strong>{{ confidence }}</strong></p>
+                <img src="{{ user_image }}" class="fish-img" alt="User upload">
+            </div>
         {% endif %}
     </div>
+
 </body>
 </html>
